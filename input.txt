@@ -1,0 +1,3 @@
+int aux = 6;
+aux = aux + 5;
+RETURN aux;
