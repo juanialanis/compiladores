@@ -47,12 +47,11 @@ extern int yydebug;
   {
     INT = 258,
     ID = 259,
-    TMENOS = 260,
-    TINT = 261,
-    TBOOL = 262,
-    TTRUE = 263,
-    TFALSE = 264,
-    RETURN = 265
+    TINT = 260,
+    TBOOL = 261,
+    TTRUE = 262,
+    TFALSE = 263,
+    RETURN = 264
   };
 #endif
 
@@ -64,7 +63,7 @@ union YYSTYPE
 #line 122 "calc-sintaxis.y" /* yacc.c:1909  */
  int i; char *s; struct treeN *tn;
 
-#line 68 "calc-sintaxis.tab.h" /* yacc.c:1909  */
+#line 67 "calc-sintaxis.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -41,8 +41,6 @@ digito [0-9]
                                 printf("ID : %s\n",yytext);
                                 return ID;}
 
-"-"                       {  printf("%s\n",yytext);
-                                  return TMENOS;} 
 
 
 [+*;()=]                   {  printf("SIMBOLO: %s\n",yytext);

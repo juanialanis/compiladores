@@ -123,14 +123,12 @@ void printTree(tree* tree){
  
 %token<i> INT
 %token<s> ID
-%token TMENOS
 %token TINT TBOOL TTRUE TFALSE
 %token RETURN
 
 %type<tn> VALOR expr decl stmt stmts decls prog
 %type<i> type
 
-%left '+' TMENOS 
 %left '*'
 
  
@@ -192,12 +190,7 @@ expr: VALOR
     | expr '*' expr {   
                         node root = {0, 0, None, MULTIPLICACION, NULL}; 
                         $$ = newTree(root, $1, $3);
-                    }
-
-    | expr TMENOS expr {   
-                        node root = {0, 0, None, RESTA, NULL}; 
-                        $$ = newTree(root, $1, $3);
-                    }    
+                    }   
 
     | '(' expr ')' { $$ = $2;}
 
