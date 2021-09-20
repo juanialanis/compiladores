@@ -237,9 +237,10 @@ prog: decls stmts {
                     node* root = newNode(0, 0, None, PROG, NULL);
                     $$ = newTree(root, $1, $2); 
                     printf("La expresion es aceptada\n El arbol es: \n");
-                    // printTree($$);
                     checkAssignaments($$->left);
                     checkOperationsAndAssignaments($$->right);
+                    printTree($$);
+
                 };   
 
 stmts: stmt             { $$ = $1; }

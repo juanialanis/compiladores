@@ -14,11 +14,12 @@
   ```
   int aux = 6;
   bool aux2 = FALSE;
+  bool aux = FALSE;
   aux = aux + 1;
   RETURN aux;
   ```
 
-- No acepta por uso de variables no declaras
+- No acepta por uso de variables no declaradas
 
   ```
   int aux = 6;
@@ -27,7 +28,7 @@
   RETURN aux;
   ```
 
-  Arreglar mensaje:
+  
 
   ```
   int aux = 6;
