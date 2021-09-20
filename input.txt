@@ -1,4 +1,4 @@
 int aux = 6;
 bool aux2 = FALSE;
 aux2 = FALSE * TRUE;
-RETURN aux;
+RETURN aux4;
