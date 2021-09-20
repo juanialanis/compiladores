@@ -25,13 +25,14 @@ typedef struct treeN {
     struct treeN* right;
 } tree;
  
-
+//struct that defines a symbols table
 typedef struct symbolTable{
     node* cSymbol;
     struct symbolTable* next;
 } symbolTable;
 
 
+//method that creates a new table of symbols
 symbolTable* newTableOfSymbols(node* s){
     symbolTable* newTable = malloc(sizeof(symbolTable));
     newTable->cSymbol = s;
@@ -65,6 +66,7 @@ char* getLabel(enum TLabel label){
     }
 }
 
+//table of symbols
 symbolTable* tableOfSymbols = NULL;
 
 //method that create a new tree
@@ -142,7 +144,7 @@ void printTree(tree* tree){
 }
 
 
-
+//method that returns the type of an sub-tree
 enum TType typeOf(tree* tree){
     if(tree->left == NULL && tree->right == NULL){
         if(tree->atr->text != NULL){
@@ -171,10 +173,25 @@ enum TType typeOf(tree* tree){
     }
 }
 
+//method that if the type of an right branch and left branch are of the same type
 int checkTypes(tree* tree){
     return typeOf(tree->left) == typeOf(tree->right);
-}
+}   
 
+int checkAssignaments(tree* tree){
+    
+    if(tree == NULL) return 1;
+
+    if(!strcmp(getLabel(tree->atr->label),"DECL")){   
+        if(!checkTypes(tree)){
+            printf("One of the types are incorrect \"%s\" != (\"%d\",\"%s\") \n",getType(tree->left->atr->type),tree->right->atr->value,getType(tree->right->atr->type));
+            quick_exit(0);
+        }
+    }
+    checkAssignaments(tree->left);
+    checkAssignaments(tree->right);
+
+}
 
 %}
  
@@ -197,6 +214,7 @@ prog: decls stmts {
                     $$ = newTree(root, $1, $2); 
                     printf("La expresion es aceptada\n El arbol es: \n");
                     // printTree($$);
+                    checkAssignaments($$->left);
                 };   
 
 stmts: stmt             { $$ = $1; }
@@ -299,7 +317,6 @@ expr: VALOR
     | '(' expr ')' { $$ = $2;}
 
     | ID {
-        //verificar aca que la variable este declarada
         symbolTable* pointer = tableOfSymbols;
         while(pointer != NULL){
             if(!strcmp(pointer->cSymbol->text,$1 )){
@@ -312,7 +329,6 @@ expr: VALOR
                 quick_exit(0);
             }
         }
-        printf("A NODE LE ASIGNO %s \n", treetoString(pointer->cSymbol));
         node* root = pointer->cSymbol; 
         $$ = newTree(root, NULL, NULL);
     }
