@@ -68,3 +68,14 @@
   aux = FALSE + 5;
   RETURN aux;
   ```
+
+- Acepta
+  
+  ```
+  int aux = 6;
+  bool aux2 = FALSE;
+  aux = 6 + 5 + 7;
+  RETURN aux;
+  aux2 = TRUE * FALSE;
+  RETURN aux2;
+  ```
