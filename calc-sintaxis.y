@@ -238,7 +238,7 @@ prog: decls stmts {
                     $$ = newTree(root, $1, $2); 
                     printf("La expresion es aceptada\n El arbol es: \n");
                     // printTree($$);
-                    // checkAssignaments($$->left);
+                    checkAssignaments($$->left);
                     checkOperationsAndAssignaments($$->right);
                 };   
 

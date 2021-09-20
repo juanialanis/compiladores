@@ -1452,7 +1452,7 @@ yyreduce:
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
                     printf("La expresion es aceptada\n El arbol es: \n");
                     // printTree($$);
-                    // checkAssignaments($$->left);
+                    checkAssignaments((yyval.tn)->left);
                     checkOperationsAndAssignaments((yyval.tn)->right);
                 }
 #line 1459 "calc-sintaxis.tab.c" /* yacc.c:1646  */
