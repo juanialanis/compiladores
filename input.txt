@@ -1,3 +1,4 @@
 int aux = 6;
-aux = aux + 5;
+bool aux2 = FALSE;
+aux2 = FALSE * TRUE;
 RETURN aux;
