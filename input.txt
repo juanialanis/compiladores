@@ -1,5 +1,4 @@
 int aux = 6;
-bool aux2 = 5;
-aux2 = FALSE * TRUE;
-aux = FALSE;
+bool aux2 = FALSE;
+aux = TRUE + FALSE;
 RETURN aux2;

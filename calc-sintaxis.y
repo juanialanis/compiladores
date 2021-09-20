@@ -190,9 +190,33 @@ int checkAssignaments(tree* tree){
     }
     checkAssignaments(tree->left);
     checkAssignaments(tree->right);
-
 }
 
+
+int checkOperationsAndAssignaments(tree* tree){
+    if(tree == NULL) return 1;
+
+    if(!strcmp(getLabel(tree->atr->label),"STMT")){
+        symbolTable* pointer = tableOfSymbols;
+        while(pointer != NULL){
+            if(!strcmp(pointer->cSymbol->text,tree->left->atr->text )){
+                break;
+            }else{
+                pointer = pointer->next;
+            }
+            if(pointer == NULL){
+                printf("Variable \"%s\" not exists. \n", tree->left->atr->text);
+                quick_exit(0);
+            }
+        }
+        if(!checkTypes(tree)){
+            printf("The type of the variable \"%s\" is incompatible with the value (\"%d\",\"%s\") \n",tree->left->atr->text,tree->right->atr->value,getType(tree->right->atr->type));
+            quick_exit(0);
+        }
+    }
+    checkOperationsAndAssignaments(tree->left);
+    checkOperationsAndAssignaments(tree->right);
+}
 %}
  
 %union { int i; char *s; struct treeN *tn;}
@@ -214,7 +238,8 @@ prog: decls stmts {
                     $$ = newTree(root, $1, $2); 
                     printf("La expresion es aceptada\n El arbol es: \n");
                     // printTree($$);
-                    checkAssignaments($$->left);
+                    // checkAssignaments($$->left);
+                    checkOperationsAndAssignaments($$->right);
                 };   
 
 stmts: stmt             { $$ = $1; }
