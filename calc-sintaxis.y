@@ -8,6 +8,7 @@ enum TLabel { NONE, DECL, STMT, SUMA, MULTIPLICACION, RESTA, SEMICOLON, PROG, RE
 
 enum TType {None, Int, Bool, };
 
+
 //struct that defines a node
 typedef struct infoNode {
     int value;
@@ -15,6 +16,7 @@ typedef struct infoNode {
     enum TType type;
     enum TLabel label;
     char* text;
+    // struct symbolTable* symbol;
 } node;
 
 //struct that defines a tree
@@ -24,6 +26,31 @@ typedef struct treeN {
     struct treeN* right;
 } tree;
 
+typedef struct symbol{
+    char* name;
+    enum TType type;
+} symbol;
+ 
+
+typedef struct symbolTable{
+    symbol* cSymbol;
+    struct symbolTable* next;
+} symbolTable;
+
+
+symbolTable* newTableOfSymbols(symbol* s){
+    symbolTable* newTable = malloc(sizeof(symbolTable));
+    newTable->cSymbol = s;
+    newTable->next = NULL;
+    return newTable;
+}
+
+symbol* newSymbol(enum TType type, char* name){
+    symbol* s = malloc(sizeof(symbol));
+    s->name = name;
+    s->type = type;
+    return s;
+}
 
 //method that returns the string equivalent to the types
 char* getType(enum TType type){
@@ -59,7 +86,6 @@ tree* newTree(node newatr, tree *newleft, tree *newright){
     newTree->right = newright;
     return newTree;
 }
-
 
 
 //as the concatenation gave us a lot of problems, we finally decided to use this option that we found in
@@ -117,6 +143,13 @@ void printTree(tree* tree){
     printf("}\n");
 }
 
+void printTable(symbolTable* table){
+    symbol* s = table->cSymbol;
+    char* name = s->name;
+    printf("%s \n",name);
+    printTable(table->next);
+}
+
 %}
  
 %union { int i; char *s; struct treeN *tn;}
@@ -126,7 +159,7 @@ void printTree(tree* tree){
 %token TINT TBOOL TTRUE TFALSE
 %token RETURN
 
-%type<tn> VALOR expr decl stmt stmts decls prog
+%type<tn> VALOR expr decl stmt stmts decls prog returnd
 %type<i> type
 
 %left '*'
@@ -137,15 +170,11 @@ prog: decls stmts {
                     node root = {0, 0, None, PROG, NULL};
                     $$ = newTree(root, $1, $2); 
                     printf("La expresion es aceptada\n El arbol es: \n");
-                    printTree($$); 
+                    // printTree($$); 
+                    printTable(tableOfSymbols);
                 };   
 
-stmts: stmt RETURN expr ';'{ 
-                            node root = {0, 0, None, SEMICOLON, NULL};
-                            node sonR = {0, 0, None, RET, NULL};
-                            tree* newTR = newTree(sonR, $3, NULL);
-                            $$ = newTree(root, $1, newTR); 
-                        }
+stmts: stmt             { $$ = $1; }
 
     | stmt stmts {
                     node root = {0, 0, None, SEMICOLON, NULL};
@@ -159,6 +188,12 @@ stmt: ID '=' expr ';' {
                         tree* newTL = newTree(sonL, NULL, NULL);
                         $$ = newTree(root, newTL, $3); 
                     } 
+
+    | RETURN expr ';'  {
+                           
+                            node root = {0, 0, None, RET, NULL};
+                            $$ = newTree(root,NULL,$2);
+                       }
     ;
 
 decls: decl { $$ = $1;}
@@ -166,9 +201,31 @@ decls: decl { $$ = $1;}
                     node root = {0, 0, None, SEMICOLON, NULL};
                     $$ = newTree(root, $1, $2); 
                 }
+    | decl returnd {
+                    node root = {0, 0, None, SEMICOLON, NULL};
+                    $$ = newTree(root, $1, $2); 
+                }
     ;
 
+returnd: RETURN expr ';' decls { 
+                                node root = {0, 0, None, SEMICOLON, NULL};
+                                node sonL = {0, 0, None, RET, NULL};
+                                tree* treeL = newTree(sonL,NULL, $2);
+                                $$ = newTree(root, treeL, $4);
+                                }
+
+
+        | RETURN expr ';' stmts { 
+                                node root = {0, 0, None, SEMICOLON, NULL};
+                                node sonL = {0, 0, None, RET, NULL};
+                                tree* treeL = newTree(sonL,NULL, $2);
+                                $$ = newTree(root, treeL, $4);
+                                }
+
 decl: type ID '=' expr ';'{
+                            // // symbol* s = newSymbol($1,$2);
+                            // symbolTable *st = newTableOfSymbols(s);
+                            // tableOfSymbols->next = st;
                             node root = {0, 0, None, DECL, NULL};
                             node sonL = {0, 0, $1, NONE, $2};
                             tree* newTL = newTree(sonL, NULL, NULL);
