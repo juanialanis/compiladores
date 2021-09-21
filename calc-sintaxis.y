@@ -286,12 +286,13 @@ returnd: RETURN expr ';' decls {
                                 }
 
 
-        | RETURN expr ';' stmts { 
+        | RETURN expr ';' { 
                                 node* root = newNode(0, 0, None, SEMICOLON, NULL);
                                 node* sonL = newNode(0, 0, None, RET, NULL);
                                 tree* treeL = newTree(sonL,NULL, $2);
-                                $$ = newTree(root, treeL, $4);
+                                $$ = newTree(root, treeL, NULL);
                                 }
+
 
 decl: type ID '=' expr ';'{
                             node* root = newNode(0, 0, None, DECL, NULL);
