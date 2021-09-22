@@ -79,3 +79,12 @@
   aux2 = TRUE * FALSE;
   RETURN aux2;
   ```
+  ```
+  bool aux = TRUE;
+  bool isEmpty = FALSE;
+  int x = 4;
+  int x2 = aux * x + 158;
+  RETURN x * FALSE;
+  x = x + 5;
+  RETURN (x * 100);
+  ```

@@ -786,7 +786,7 @@ case 1:
 YY_RULE_SETUP
 #line 20 "calc-lexico.l"
 { yylval.i = atoi(yytext);
-                                printf("INT : %d\n",atoi(yytext)); 
+                                printf("INT : %d\n",atoi(yytext));
                                 return INT;}
 	YY_BREAK
 case 2:
