@@ -1,0 +1,4 @@
+int aux = 6;
+bool aux2 = FALSE;
+aux2 = 5;
+RETURN aux;

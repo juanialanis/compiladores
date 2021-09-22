@@ -167,7 +167,7 @@ enum TType typeOf(tree* tree){
                 return typeOf(tree->left);
             }
             else{
-                printf("Syntax error at the line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->atr->label));
+                printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->atr->label));
                 quick_exit(0);
             }
         }
@@ -185,7 +185,7 @@ int checkAssignaments(tree* tree){
 
     if(!strcmp(getLabel(tree->atr->label),"DECL")){   
         if(!checkTypes(tree)){
-            printf("Syntax error at the line %d. Incompatible types for the inicialization. \n",tree->atr->line);
+            printf("Syntax error in line %d. Incompatible types for the initialization. \n",tree->atr->line);
             quick_exit(0);
         }
     }
@@ -206,19 +206,19 @@ int checkOperationsAndAssignaments(tree* tree){
                 pointer = pointer->next;
             }
             if(pointer == NULL){
-                printf("Syntax error at the line %d. Variable \"%s\" not exists. \n", tree->atr->line ,tree->left->atr->text);
+                printf("Syntax error in line %d. Variable \"%s\" does not exist. \n", tree->atr->line ,tree->left->atr->text);
                 quick_exit(0);
             }
         }
         if(!checkTypes(tree)){
-            printf("Syntax error at the line %d. Incompatible types for the assignament. \n",tree->atr->line);
+            printf("Syntax error in line %d. Incompatible types for the assignment. \n",tree->atr->line);
             quick_exit(0);
         }
     }
 
     if(!strcmp(getLabel(tree->atr->label),"RETURN")){
         if(checkTypes(tree->right)){
-            printf("Syntax error at the line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
+            printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
             quick_exit(0);
         }
     }
@@ -310,7 +310,7 @@ decl: type ID '=' expr ';'{
                                 symbolTable* pointer = tableOfSymbols;
                                 while(pointer != NULL){
                                     if(!strcmp(pointer->cSymbol->text,$2 )){
-                                        printf("Syntax error at the line %d. Variable \"%s\" already declared. \n", yylineno, $2);
+                                        printf("Syntax error in line %d. Variable \"%s\" already declared. \n", yylineno, $2);
                                         quick_exit(0);
                                     }
                                     if(pointer->next == NULL){
@@ -360,7 +360,7 @@ expr: VALOR
                 pointer = pointer->next;
             }
             if(pointer == NULL){
-                printf("Syntax error at the line %d. Variable \"%s\" not exists . \n", yylineno, $1);
+                printf("Syntax error in line %d. Variable \"%s\" does not exist. \n", yylineno, $1);
                 quick_exit(0);
             }
         }
