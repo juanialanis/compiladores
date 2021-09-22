@@ -229,6 +229,40 @@ int checkOperationsAndAssignaments(tree* tree){
     checkOperationsAndAssignaments(tree->right);
 }
 
+int getValueOf(tree* tree){
+    if(tree->left == NULL && tree->right == NULL){
+        return tree->atr->value;
+    }
+    else{
+        if(!strcmp(getLabel(tree->atr->label),"SUMA")){
+            return getValueOf(tree->left) + getValueOf(tree->right);
+        }
+        if(!strcmp(getLabel(tree->atr->label),"MULTIPLICACION")){
+            return getValueOf(tree->left) * getValueOf(tree->right);
+        }
+    }
+}
+
+void setResultOfOperations(tree* tree){
+    if(tree != NULL){
+            
+        if(!strcmp(getLabel(tree->atr->label),"DECL") || !strcmp(getLabel(tree->atr->label),"STMT")){
+            tree->left->atr->value = getValueOf(tree->right);
+        }
+        if(!strcmp(getLabel(tree->atr->label),"RETURN")){
+            if(tree->atr->type == Bool){
+                printf("RETURN OF LINE %d RETURNS %s \n",tree->atr->line,getValueOf(tree->right) == 0 ? "FALSE" : "TRUE");
+            }
+            else{
+                printf("RETURN OF LINE %d RETURNS %d \n",tree->atr->line,getValueOf(tree->right));
+            }
+        }
+        setResultOfOperations(tree->left);
+        setResultOfOperations(tree->right);   
+    }
+}
+
+
 %}
  
 %union { int i; char *s; struct treeN *tn;}
@@ -251,8 +285,9 @@ prog: decls stmts {
                     $$ = newTree(root, $1, $2); 
                     checkAssignaments($$->left);
                     checkOperationsAndAssignaments($$->right);
-                    printf("La expresion es aceptada\n El arbol es: \n");
-                    printTree($$);
+                    // printf("La expresion es aceptada\n El arbol es: \n");
+                    // printTree($$);
+                    setResultOfOperations($$);
                 };   
 
 stmts: stmt             { $$ = $1; }
