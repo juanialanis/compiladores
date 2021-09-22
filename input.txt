@@ -1,7 +1,7 @@
 bool aux = TRUE;
 bool isEmpty = FALSE;
 int x = 4;
-int x2 = aux * x + 158;
+bool x2 = aux * TRUE + FALSE;
 RETURN x * FALSE;
 x = x + 5;
 RETURN (x * 100);

@@ -215,9 +215,17 @@ int checkOperationsAndAssignaments(tree* tree){
             quick_exit(0);
         }
     }
+
+    if(!strcmp(getLabel(tree->atr->label),"RETURN")){
+        if(checkTypes(tree->right)){
+            printf("Syntax error at the line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
+            quick_exit(0);
+        }
+    }
     checkOperationsAndAssignaments(tree->left);
     checkOperationsAndAssignaments(tree->right);
 }
+
 %}
  
 %union { int i; char *s; struct treeN *tn;}
@@ -237,11 +245,10 @@ int checkOperationsAndAssignaments(tree* tree){
 prog: decls stmts { 
                     node* root = newNode(0, yylineno, None, PROG, NULL);
                     $$ = newTree(root, $1, $2); 
-                    printf("La expresion es aceptada\n El arbol es: \n");
                     checkAssignaments($$->left);
-                    checkOperationsAndAssignaments($$->right);
+                    checkOperationsAndAssignaments($$);
+                    printf("La expresion es aceptada\n El arbol es: \n");
                     printTree($$);
-
                 };   
 
 stmts: stmt             { $$ = $1; }
