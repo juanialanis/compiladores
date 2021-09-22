@@ -8,6 +8,7 @@ enum TLabel { NONE, DECL, STMT, SUMA, MULTIPLICACION, RESTA, SEMICOLON, PROG, RE
 
 enum TType {None, Int, Bool };
 
+extern int yylineno;
 
 //struct that defines a node*
 typedef struct infoNode {
@@ -166,7 +167,7 @@ enum TType typeOf(tree* tree){
                 return typeOf(tree->left);
             }
             else{
-                printf("Incompatible types for the operation %s \n", getLabel(tree->atr->label));
+                printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->atr->label));
                 quick_exit(0);
             }
         }
@@ -184,7 +185,7 @@ int checkAssignaments(tree* tree){
 
     if(!strcmp(getLabel(tree->atr->label),"DECL")){   
         if(!checkTypes(tree)){
-            printf("One of the types are incorrect \"%s\" != (\"%d\",\"%s\") \n",getType(tree->left->atr->type),tree->right->atr->value,getType(tree->right->atr->type));
+            printf("Syntax error in line %d. Incompatible types for the initialization. \n",tree->atr->line);
             quick_exit(0);
         }
     }
@@ -205,18 +206,26 @@ int checkOperationsAndAssignaments(tree* tree){
                 pointer = pointer->next;
             }
             if(pointer == NULL){
-                printf("Variable \"%s\" not exists. \n", tree->left->atr->text);
+                printf("Syntax error in line %d. Variable \"%s\" does not exist. \n", tree->atr->line ,tree->left->atr->text);
                 quick_exit(0);
             }
         }
         if(!checkTypes(tree)){
-            printf("The type of the variable \"%s\" is incompatible with the value (\"%d\",\"%s\") \n",tree->left->atr->text,tree->right->atr->value,getType(tree->right->atr->type));
+            printf("Syntax error in line %d. Incompatible types for the assignment. \n",tree->atr->line);
+            quick_exit(0);
+        }
+    }
+
+    if(!strcmp(getLabel(tree->atr->label),"RETURN")){
+        if(checkTypes(tree->right)){
+            printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
             quick_exit(0);
         }
     }
     checkOperationsAndAssignaments(tree->left);
     checkOperationsAndAssignaments(tree->right);
 }
+
 %}
  
 %union { int i; char *s; struct treeN *tn;}
@@ -234,27 +243,26 @@ int checkOperationsAndAssignaments(tree* tree){
  
 %%
 prog: decls stmts { 
-                    node* root = newNode(0, 0, None, PROG, NULL);
+                    node* root = newNode(0, yylineno, None, PROG, NULL);
                     $$ = newTree(root, $1, $2); 
-                    printf("La expresion es aceptada\n El arbol es: \n");
                     checkAssignaments($$->left);
-                    checkOperationsAndAssignaments($$->right);
+                    checkOperationsAndAssignaments($$);
+                    printf("La expresion es aceptada\n El arbol es: \n");
                     printTree($$);
-
                 };   
 
 stmts: stmt             { $$ = $1; }
 
     | stmt stmts {
-                    node* root = newNode(0, 0, None, SEMICOLON, NULL);
+                    node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     $$ = newTree(root, $1, $2); 
                 }
     ;
 
 stmt: ID '=' expr ';' {
                         symbolTable* pointer = tableOfSymbols;
-                        node* root = newNode(0, 0, None, STMT, NULL);
-                        node* sonL = newNode(0, 0, None, NONE, $1);
+                        node* root = newNode(0, yylineno, None, STMT, NULL);
+                        node* sonL = newNode(0, yylineno, None, NONE, $1);
                         tree* newTL = newTree(sonL, NULL, NULL);
                         tree* treeCmp = newTree(root, newTL, $3);
                         $$ = treeCmp;
@@ -262,47 +270,47 @@ stmt: ID '=' expr ';' {
 
     | RETURN expr ';'  {
                            
-                            node* root = newNode(0, 0, None, RET, NULL);
+                            node* root = newNode(0, yylineno, None, RET, NULL);
                             $$ = newTree(root,NULL,$2);
                        }
     ;
 
 decls: decl { $$ = $1;}
     | decl decls {
-                    node* root = newNode(0, 0, None, SEMICOLON, NULL);
+                    node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     $$ = newTree(root, $1, $2); 
                 }
     | decl returnd {
-                    node* root = newNode(0, 0, None, SEMICOLON, NULL);
+                    node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     $$ = newTree(root, $1, $2); 
                 }
     ;
 
 returnd: RETURN expr ';' decls { 
-                                node* root = newNode(0, 0, None, SEMICOLON, NULL);
-                                node* sonL = newNode(0, 0, None, RET, NULL);
+                                node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
+                                node* sonL = newNode(0, yylineno, None, RET, NULL);
                                 tree* treeL = newTree(sonL,NULL, $2);
                                 $$ = newTree(root, treeL, $4);
                                 }
 
 
         | RETURN expr ';' { 
-                                node* root = newNode(0, 0, None, SEMICOLON, NULL);
-                                node* sonL = newNode(0, 0, None, RET, NULL);
+                                node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
+                                node* sonL = newNode(0, yylineno, None, RET, NULL);
                                 tree* treeL = newTree(sonL,NULL, $2);
                                 $$ = newTree(root, treeL, NULL);
                                 }
 
 
 decl: type ID '=' expr ';'{
-                            node* root = newNode(0, 0, None, DECL, NULL);
-                            node* sonL = newNode(0, 0, $1, NONE, $2);
+                            node* root = newNode(0, yylineno, None, DECL, NULL);
+                            node* sonL = newNode(0, yylineno, $1, NONE, $2);
                             symbolTable *st = newTableOfSymbols(sonL);
                             if(tableOfSymbols != NULL){
                                 symbolTable* pointer = tableOfSymbols;
                                 while(pointer != NULL){
                                     if(!strcmp(pointer->cSymbol->text,$2 )){
-                                        printf("Variable \"%s\" already declared. \n", $2);
+                                        printf("Syntax error in line %d. Variable \"%s\" already declared. \n", yylineno, $2);
                                         quick_exit(0);
                                     }
                                     if(pointer->next == NULL){
@@ -330,13 +338,13 @@ expr: VALOR
 
     | expr '+' expr {
 
-                        node* root = newNode(0, 0, None, SUMA, NULL); 
+                        node* root = newNode(0, yylineno, None, SUMA, NULL); 
                         tree* newTreeA = newTree(root, $1, $3);
                         $$ = newTreeA;
                     }
 
     | expr '*' expr {   
-                        node* root = newNode(0, 0, None, MULTIPLICACION, NULL); 
+                        node* root = newNode(0, yylineno, None, MULTIPLICACION, NULL); 
                         tree* newTreeA = newTree(root, $1, $3);
                         $$ = newTreeA;
                     }   
@@ -352,7 +360,7 @@ expr: VALOR
                 pointer = pointer->next;
             }
             if(pointer == NULL){
-                printf("Variable \"%s\" not exists. \n", $1);
+                printf("Syntax error in line %d. Variable \"%s\" does not exist. \n", yylineno, $1);
                 quick_exit(0);
             }
         }

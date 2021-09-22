@@ -18,7 +18,7 @@ digito [0-9]
 %%
 
 {digito}+                     { yylval.i = atoi(yytext);
-                                printf("INT : %d\n",atoi(yytext)); 
+                                printf("INT : %d\n",atoi(yytext));
                                 return INT;}
 
 "int"                        { printf("TINT: %s\n",yytext);
