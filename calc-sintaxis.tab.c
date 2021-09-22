@@ -73,8 +73,7 @@
 extern int yylineno;
 
 
-
-#line 78 "calc-sintaxis.tab.c" /* yacc.c:339  */
+#line 77 "calc-sintaxis.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -124,10 +123,10 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "calc-sintaxis.y" /* yacc.c:355  */
+#line 12 "calc-sintaxis.y" /* yacc.c:355  */
  int i; char *s; struct treeN *tn;
 
-#line 131 "calc-sintaxis.tab.c" /* yacc.c:355  */
+#line 130 "calc-sintaxis.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -144,7 +143,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 148 "calc-sintaxis.tab.c" /* yacc.c:358  */
+#line 147 "calc-sintaxis.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -442,8 +441,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    28,    28,    38,    40,    46,    55,    62,    63,    70,
-      98,    99,   102,   104,   111,   117,   119,   137,   141,   145
+       0,    27,    27,    37,    39,    45,    54,    61,    62,    69,
+      97,    98,   101,   103,   110,   116,   118,   136,   140,   144
 };
 #endif
 
@@ -1228,7 +1227,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 28 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 27 "calc-sintaxis.y" /* yacc.c:1646  */
     { 
                     node* root = newNode(0, yylineno, None, PROG, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
@@ -1238,26 +1237,26 @@ yyreduce:
                     // printTree($$);
                     setResultOfOperations((yyval.tn));
                 }
-#line 1242 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1241 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 38 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 37 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[0].tn); }
-#line 1248 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1247 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 40 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 39 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                     node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
                 }
-#line 1257 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1256 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 46 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 45 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                         symbolTable* pointer = tableOfSymbols;
                         node* root = newNode(0, yylineno, None, STMT, NULL);
@@ -1266,36 +1265,36 @@ yyreduce:
                         tree* treeCmp = newTree(root, newTL, (yyvsp[-1].tn));
                         (yyval.tn) = treeCmp;
                     }
-#line 1270 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1269 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 55 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 54 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                            
                             node* root = newNode(0, yylineno, None, RET, NULL);
                             (yyval.tn) = newTree(root,NULL,(yyvsp[-1].tn));
                        }
-#line 1280 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1279 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 62 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 61 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[0].tn);}
-#line 1286 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1285 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 63 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 62 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                     node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
                 }
-#line 1295 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1294 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 70 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 69 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                             node* root = newNode(0, yylineno, None, DECL, NULL);
                             node* sonL = newNode(0, yylineno, (yyvsp[-4].i), NONE, (yyvsp[-3].s));
@@ -1322,50 +1321,50 @@ yyreduce:
                             tree* treeCmp = newTree(root, newTL, (yyvsp[-1].tn));
                             (yyval.tn) = treeCmp;
                         }
-#line 1326 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1325 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 98 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 97 "calc-sintaxis.y" /* yacc.c:1646  */
     {(yyval.i) = Int;}
-#line 1332 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1331 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 99 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 98 "calc-sintaxis.y" /* yacc.c:1646  */
     {(yyval.i) = Bool;}
-#line 1338 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1337 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 104 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 103 "calc-sintaxis.y" /* yacc.c:1646  */
     {
 
                         node* root = newNode(0, yylineno, None, SUMA, NULL); 
                         tree* newTreeA = newTree(root, (yyvsp[-2].tn), (yyvsp[0].tn));
                         (yyval.tn) = newTreeA;
                     }
-#line 1349 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1348 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 111 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 110 "calc-sintaxis.y" /* yacc.c:1646  */
     {   
                         node* root = newNode(0, yylineno, None, MULTIPLICACION, NULL); 
                         tree* newTreeA = newTree(root, (yyvsp[-2].tn), (yyvsp[0].tn));
                         (yyval.tn) = newTreeA;
                     }
-#line 1359 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1358 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 117 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 116 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[-1].tn);}
-#line 1365 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1364 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 119 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 118 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         symbolTable* pointer = tableOfSymbols;
         while(pointer != NULL){
@@ -1382,38 +1381,38 @@ yyreduce:
         node* root = pointer->cSymbol; 
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1386 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1385 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 137 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 136 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         node* root = newNode((yyvsp[0].i), 0, Int, NONE, NULL); 
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1395 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1394 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 141 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 140 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         node* root = newNode(1, 0, Bool, NONE, NULL);
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1404 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1403 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 145 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 144 "calc-sintaxis.y" /* yacc.c:1646  */
     { 
         node* root = newNode(0, 0, Bool, NONE, NULL);
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1413 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1412 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1417 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1416 "calc-sintaxis.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1641,5 +1640,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 152 "calc-sintaxis.y" /* yacc.c:1906  */
+#line 151 "calc-sintaxis.y" /* yacc.c:1906  */
 

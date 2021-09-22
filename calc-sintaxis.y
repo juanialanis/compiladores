@@ -7,7 +7,6 @@
 
 extern int yylineno;
 
-
 %}
  
 %union { int i; char *s; struct treeN *tn;}
