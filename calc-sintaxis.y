@@ -176,6 +176,10 @@ enum TType typeOf(tree* tree){
 
 //method that if the type of an right branch and left branch are of the same type
 int checkTypes(tree* tree){
+    if(tree->right == NULL && tree->left == NULL){
+        typeOf(tree);
+        return 1;
+    }
     return typeOf(tree->left) == typeOf(tree->right);
 }   
 
@@ -215,9 +219,8 @@ int checkOperationsAndAssignaments(tree* tree){
             quick_exit(0);
         }
     }
-
     if(!strcmp(getLabel(tree->atr->label),"RETURN")){
-        if(checkTypes(tree->right)){
+        if(!checkTypes(tree->right)){
             printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
             quick_exit(0);
         }
@@ -235,9 +238,10 @@ int checkOperationsAndAssignaments(tree* tree){
 %token TINT TBOOL TTRUE TFALSE
 %token RETURN
 
-%type<tn> VALOR expr decl stmt stmts decls prog returnd
+%type<tn> VALOR expr decl stmt stmts decls prog 
 %type<i> type
 
+%left '+'
 %left '*'
 
  
@@ -246,7 +250,7 @@ prog: decls stmts {
                     node* root = newNode(0, yylineno, None, PROG, NULL);
                     $$ = newTree(root, $1, $2); 
                     checkAssignaments($$->left);
-                    checkOperationsAndAssignaments($$);
+                    checkOperationsAndAssignaments($$->right);
                     printf("La expresion es aceptada\n El arbol es: \n");
                     printTree($$);
                 };   
@@ -280,26 +284,7 @@ decls: decl { $$ = $1;}
                     node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     $$ = newTree(root, $1, $2); 
                 }
-    | decl returnd {
-                    node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
-                    $$ = newTree(root, $1, $2); 
-                }
     ;
-
-returnd: RETURN expr ';' decls { 
-                                node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
-                                node* sonL = newNode(0, yylineno, None, RET, NULL);
-                                tree* treeL = newTree(sonL,NULL, $2);
-                                $$ = newTree(root, treeL, $4);
-                                }
-
-
-        | RETURN expr ';' { 
-                                node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
-                                node* sonL = newNode(0, yylineno, None, RET, NULL);
-                                tree* treeL = newTree(sonL,NULL, $2);
-                                $$ = newTree(root, treeL, NULL);
-                                }
 
 
 decl: type ID '=' expr ';'{
