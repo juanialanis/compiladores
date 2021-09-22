@@ -68,268 +68,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-enum TLabel { NONE, DECL, STMT, SUMA, MULTIPLICACION, RESTA, SEMICOLON, PROG, RET};
-
-enum TType {None, Int, Bool };
+#include "treeManagement.h"
 
 extern int yylineno;
 
-//struct that defines a node*
-typedef struct infoNode {
-    int value;
-    int line;
-    enum TType type;
-    enum TLabel label;
-    char* text;
-} node;
 
-//struct that defines a tree
-typedef struct treeN {
-    node* atr;
-    struct treeN* left;
-    struct treeN* right;
-} tree;
- 
-//struct that defines a symbols table
-typedef struct symbolTable{
-    node* cSymbol;
-    struct symbolTable* next;
-} symbolTable;
-
-
-//method that creates a new table of symbols
-symbolTable* newTableOfSymbols(node* s){
-    symbolTable* newTable = malloc(sizeof(symbolTable));
-    newTable->cSymbol = s;
-    newTable->next = NULL;
-    return newTable;
-}
-
-
-//method that returns the string equivalent to the types
-char* getType(enum TType type){
-    switch(type){
-        case None: return "None";
-        case Bool: return "Bool";
-        case Int: return "Int";
-    }
-}
-
-
-//method that returns the string equivalent to the labels
-char* getLabel(enum TLabel label){
-    switch(label){
-        case NONE: return "NONE";
-        case DECL: return "DECL";
-        case STMT: return "STMT";
-        case SUMA: return "SUMA";
-        case MULTIPLICACION: return "MULTIPLICACION";
-        case RESTA: return "RESTA";
-        case RET: return "RETURN";
-        case PROG: return "PROG";
-        case SEMICOLON: return "SEMICOLON";
-    }
-}
-
-//table of symbols
-symbolTable* tableOfSymbols = NULL;
-
-//method that create a new tree
-tree* newTree(node* newatr, tree *newleft, tree *newright){
-    tree *newTree = (tree*) malloc(sizeof(tree));
-    newTree->atr = newatr;
-    newTree->left = newleft;    
-    newTree->right = newright;
-    return newTree;
-}
-
-node* newNode(int value,int line, enum TType type, enum TLabel label, char* text){
-    node* newNode = malloc(sizeof(node));
-    newNode->value = value;
-    newNode->line = line;
-    newNode->type = type;
-    newNode->label = label;
-    newNode->text = text;
-    return newNode;
-}
-
-//as the concatenation gave us a lot of problems, we finally decided to use this option that we found in
-//https://es.stackoverflow.com/questions/146607/c%C3%B3mo-concatenar-cadenas-de-car%C3%A1cteres-sin-usar-la-funci%C3%B3n-strcat
-// and later has modified by our needs
-char* cat(char *s1, char *s2) {
-  if (!s1 || !s2)
-    return s1? s1: s2;
-
-  int len = strlen(s1), len2 = strlen(s2);
-  char* result = malloc(len+len2);
-  int x;
-  for(int i = 0; i < len; i++){
-      result[i] = s1[i];
-      x = i + 1;
-  }
-  for(int j = 0; j < len2; j++){
-      result[(x+j)] = s2[j];
-  }
-  return result; 
-}
-
-//method that take an int value and parse it to char*
-char* getValue(int i) {
-    char* result = malloc(1);
-    result[0] = '0'+i;
-    return result;
-}
-
-//method that take an node* of an tree and parse it to a char* with all the fields of the tree
-char* treetoString(node* atr){
-    char* value = cat("Value: ", getValue(atr->value));
-    char* type = getType(atr->type);
-    char* text = ",Type: ";
-    char* result = cat(text,type);
-    result = cat(value,result);
-    text = ",Label: ";
-    result = cat(result,text);
-    char* label = getLabel(atr->label);
-    result = cat (result, label);
-    char* line = cat(",Line: ", getValue(atr->line));
-    result = cat(result,line);
-    result = cat(result, ",Text: ");
-    result = cat(result,atr->text != NULL ? atr->text : "");
-    return result;
-}
-
-//method that generates a sample of the tree
-void printTree(tree* tree){
-    printf("{ \n node*: { %s }\n", treetoString(tree->atr));
-    printf("\n HI: \n");
-    tree->left != NULL ? printTree(tree->left) : printf("NULL \n");
-    printf("\n HD: \n");
-    tree->right != NULL ? printTree(tree->right) : printf("NULL \n");
-    printf("}\n");
-}
-
-
-//method that returns the type of an sub-tree
-enum TType typeOf(tree* tree){
-    if(tree->left == NULL && tree->right == NULL){
-        if(tree->atr->text != NULL){
-            symbolTable* pointer = tableOfSymbols;
-            while(pointer != NULL){
-                if(!strcmp(pointer->cSymbol->text,tree->atr->text)){
-                    return pointer->cSymbol->type;
-                }
-                pointer = pointer->next;
-            }
-        }
-        else{
-            return tree->atr->type;   
-        }
-    }
-    else{
-        if(!strcmp(getLabel(tree->atr->label),"SUMA") || !strcmp(getLabel(tree->atr->label),"MULTIPLICACION")){
-            if(typeOf(tree->left) == typeOf(tree->right)){
-                return typeOf(tree->left);
-            }
-            else{
-                printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->atr->label));
-                quick_exit(0);
-            }
-        }
-    }
-}
-
-//method that if the type of an right branch and left branch are of the same type
-int checkTypes(tree* tree){
-    if(tree->right == NULL && tree->left == NULL){
-        typeOf(tree);
-        return 1;
-    }
-    return typeOf(tree->left) == typeOf(tree->right);
-}   
-
-int checkAssignaments(tree* tree){
-    
-    if(tree == NULL) return 1;
-
-    if(!strcmp(getLabel(tree->atr->label),"DECL")){   
-        if(!checkTypes(tree)){
-            printf("Syntax error in line %d. Incompatible types for the initialization. \n",tree->atr->line);
-            quick_exit(0);
-        }
-    }
-    checkAssignaments(tree->left);
-    checkAssignaments(tree->right);
-}
-
-
-int checkOperationsAndAssignaments(tree* tree){
-    if(tree == NULL) return 1;
-
-    if(!strcmp(getLabel(tree->atr->label),"STMT")){
-        symbolTable* pointer = tableOfSymbols;
-        while(pointer != NULL){
-            if(!strcmp(pointer->cSymbol->text,tree->left->atr->text )){
-                break;
-            }else{
-                pointer = pointer->next;
-            }
-            if(pointer == NULL){
-                printf("Syntax error in line %d. Variable \"%s\" does not exist. \n", tree->atr->line ,tree->left->atr->text);
-                quick_exit(0);
-            }
-        }
-        if(!checkTypes(tree)){
-            printf("Syntax error in line %d. Incompatible types for the assignment. \n",tree->atr->line);
-            quick_exit(0);
-        }
-    }
-    if(!strcmp(getLabel(tree->atr->label),"RETURN")){
-        if(!checkTypes(tree->right)){
-            printf("Syntax error in line %d. Incompatible types for the operation %s. \n",tree->atr->line,getLabel(tree->right->atr->label));
-            quick_exit(0);
-        }
-    }
-    checkOperationsAndAssignaments(tree->left);
-    checkOperationsAndAssignaments(tree->right);
-}
-
-int getValueOf(tree* tree){
-    if(tree->left == NULL && tree->right == NULL){
-        return tree->atr->value;
-    }
-    else{
-        if(!strcmp(getLabel(tree->atr->label),"SUMA")){
-            return getValueOf(tree->left) + getValueOf(tree->right);
-        }
-        if(!strcmp(getLabel(tree->atr->label),"MULTIPLICACION")){
-            return getValueOf(tree->left) * getValueOf(tree->right);
-        }
-    }
-}
-
-void setResultOfOperations(tree* tree){
-    if(tree != NULL){
-            
-        if(!strcmp(getLabel(tree->atr->label),"DECL") || !strcmp(getLabel(tree->atr->label),"STMT")){
-            tree->left->atr->value = getValueOf(tree->right);
-        }
-        if(!strcmp(getLabel(tree->atr->label),"RETURN")){
-            if(tree->atr->type == Bool){
-                printf("RETURN OF LINE %d RETURNS %s \n",tree->atr->line,getValueOf(tree->right) == 0 ? "FALSE" : "TRUE");
-            }
-            else{
-                printf("RETURN OF LINE %d RETURNS %d \n",tree->atr->line,getValueOf(tree->right));
-            }
-        }
-        setResultOfOperations(tree->left);
-        setResultOfOperations(tree->right);   
-    }
-}
-
-
-
-#line 333 "calc-sintaxis.tab.c" /* yacc.c:339  */
+#line 77 "calc-sintaxis.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -379,10 +123,10 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 268 "calc-sintaxis.y" /* yacc.c:355  */
+#line 12 "calc-sintaxis.y" /* yacc.c:355  */
  int i; char *s; struct treeN *tn;
 
-#line 386 "calc-sintaxis.tab.c" /* yacc.c:355  */
+#line 130 "calc-sintaxis.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -399,7 +143,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 403 "calc-sintaxis.tab.c" /* yacc.c:358  */
+#line 147 "calc-sintaxis.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -695,10 +439,10 @@ static const yytype_uint8 yytranslate[] =
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,   283,   283,   293,   295,   301,   310,   317,   318,   325,
-     353,   354,   357,   359,   366,   372,   374,   392,   396,   400
+       0,    27,    27,    37,    39,    45,    54,    61,    62,    69,
+      97,    98,   101,   103,   110,   116,   118,   136,   140,   144
 };
 #endif
 
@@ -1483,7 +1227,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 283 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 27 "calc-sintaxis.y" /* yacc.c:1646  */
     { 
                     node* root = newNode(0, yylineno, None, PROG, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
@@ -1493,26 +1237,26 @@ yyreduce:
                     // printTree($$);
                     setResultOfOperations((yyval.tn));
                 }
-#line 1497 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1241 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 293 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 37 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[0].tn); }
-#line 1503 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1247 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 295 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 39 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                     node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
                 }
-#line 1512 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1256 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 301 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 45 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                         symbolTable* pointer = tableOfSymbols;
                         node* root = newNode(0, yylineno, None, STMT, NULL);
@@ -1521,36 +1265,36 @@ yyreduce:
                         tree* treeCmp = newTree(root, newTL, (yyvsp[-1].tn));
                         (yyval.tn) = treeCmp;
                     }
-#line 1525 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1269 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 310 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 54 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                            
                             node* root = newNode(0, yylineno, None, RET, NULL);
                             (yyval.tn) = newTree(root,NULL,(yyvsp[-1].tn));
                        }
-#line 1535 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1279 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 317 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 61 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[0].tn);}
-#line 1541 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1285 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 318 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 62 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                     node* root = newNode(0, yylineno, None, SEMICOLON, NULL);
                     (yyval.tn) = newTree(root, (yyvsp[-1].tn), (yyvsp[0].tn)); 
                 }
-#line 1550 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1294 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 325 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 69 "calc-sintaxis.y" /* yacc.c:1646  */
     {
                             node* root = newNode(0, yylineno, None, DECL, NULL);
                             node* sonL = newNode(0, yylineno, (yyvsp[-4].i), NONE, (yyvsp[-3].s));
@@ -1577,50 +1321,50 @@ yyreduce:
                             tree* treeCmp = newTree(root, newTL, (yyvsp[-1].tn));
                             (yyval.tn) = treeCmp;
                         }
-#line 1581 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1325 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 353 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 97 "calc-sintaxis.y" /* yacc.c:1646  */
     {(yyval.i) = Int;}
-#line 1587 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1331 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 354 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 98 "calc-sintaxis.y" /* yacc.c:1646  */
     {(yyval.i) = Bool;}
-#line 1593 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1337 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 359 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 103 "calc-sintaxis.y" /* yacc.c:1646  */
     {
 
                         node* root = newNode(0, yylineno, None, SUMA, NULL); 
                         tree* newTreeA = newTree(root, (yyvsp[-2].tn), (yyvsp[0].tn));
                         (yyval.tn) = newTreeA;
                     }
-#line 1604 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1348 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 366 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 110 "calc-sintaxis.y" /* yacc.c:1646  */
     {   
                         node* root = newNode(0, yylineno, None, MULTIPLICACION, NULL); 
                         tree* newTreeA = newTree(root, (yyvsp[-2].tn), (yyvsp[0].tn));
                         (yyval.tn) = newTreeA;
                     }
-#line 1614 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1358 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 372 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 116 "calc-sintaxis.y" /* yacc.c:1646  */
     { (yyval.tn) = (yyvsp[-1].tn);}
-#line 1620 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1364 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 374 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 118 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         symbolTable* pointer = tableOfSymbols;
         while(pointer != NULL){
@@ -1637,38 +1381,38 @@ yyreduce:
         node* root = pointer->cSymbol; 
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1641 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1385 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 392 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 136 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         node* root = newNode((yyvsp[0].i), 0, Int, NONE, NULL); 
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1650 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1394 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 396 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 140 "calc-sintaxis.y" /* yacc.c:1646  */
     {
         node* root = newNode(1, 0, Bool, NONE, NULL);
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1659 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1403 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 400 "calc-sintaxis.y" /* yacc.c:1646  */
+#line 144 "calc-sintaxis.y" /* yacc.c:1646  */
     { 
         node* root = newNode(0, 0, Bool, NONE, NULL);
         (yyval.tn) = newTree(root, NULL, NULL);
     }
-#line 1668 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1412 "calc-sintaxis.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1672 "calc-sintaxis.tab.c" /* yacc.c:1646  */
+#line 1416 "calc-sintaxis.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1896,5 +1640,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 407 "calc-sintaxis.y" /* yacc.c:1906  */
+#line 151 "calc-sintaxis.y" /* yacc.c:1906  */
 
