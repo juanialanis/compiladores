@@ -6,4 +6,3 @@ Al correrlo, dara como resultado un print de todos los inputs y ademas si la cad
 
 Para corroborar que el arbol sea correcto se recomienda prestar atencion a las llaves '{}'.
 
-
